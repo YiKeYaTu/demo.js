@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title></title>
+</head>
+<body>
+	<div id="box1"></div>
+	<div id="box2"></div>
+	<div id="box3"></div>
+	<div id="box4">
+		<div class="fuck"></div>
+	</div>
+	<div id="box5"></div>
+	<div id="box6"></div>
+	<div id="box7"></div>
+	<div id="box8"></div>
+	<div id="box9"></div>
+	<div id="box10"></div>
+	<div class="boe">
+		<a class="opl">
+			<div class="lll"></div>
+			<div class="ol1"></div>
+		</a>
+		<a class="opl">
+			<div class="ol1"></div>
+		</a>
+		<a class="opl"></a>
+	</div>
+	<div class="fuck he"></div>
+	<div class="fuck he"></div>
+	<div class="fuck he"></div>
+	<div class="fuck he"></div>
+	<div class="fuck he"></div>
+	<script src="demo.js"></script>
+	<script>
+		function getElement (target) {
+			var elementPartitioning = target.split(","),
+				handle_arr = [],
+				i,
+				j,
+				k,
+				l,
+				lenI,
+				linJ,
+				temp = [],
+				tempT1 = [],
+				tempT2 = [];
+			for(i = 0,lenI = elementPartitioning.length;i < lenI;i++){
+				handle_arr[i] = elementPartitioning[i].split(" ");
+				for(j = 0,lenJ = handle_arr[i].length;j < lenJ;j++){
+					if(handle_arr[i][j][0] == "."){
+						if(temp.length == 0 && !j){
+							temp[0] = handle_arr[i][j];
+						}
+						// for(k = 0;k < temp.length;k++){
+							if(j == 0){//如果这是第一次 就直接在document上调用getElementsByClassName
+								tempT1 = getElementsByClassName(null,handle_arr[i][j].slice(1,handle_arr[i][j].length));
+								temp = tempT1;
+							}else{//否则以当前temp数组里的为父元素调用
+								tempT2 = temp;
+								temp = [];
+								for(l = 0;l < tempT2.length;l++){
+									tempT1 = getElementsByClassName(tempT2[l],handle_arr[i][j].slice(1,handle_arr[i][j].length));
+									temp = temp.concat(tempT1);
+								}
+							}
+							
+						// }
+						
+						// console.log(temp);
+						// debugger;
+					}else if(handle_arr[i][j][0] == "#"){
+						// if(temp.length){
+
+						// }else{
+
+						// }
+					}else{
+
+					}
+				}
+				console.log(temp);
+				return temp;
+			}
+		}
+		function getElementsByClassName (father,argument) {
+			var node = father || document;
+			// if(node.getElementsByClassName){
+			// 	return node.getElementsByClassName(argument);
+			// }else{
+				if(!node.getElementsByTagName){
+					return;
+				}
+				var	temp = node.getElementsByTagName("*"),
+					arr = [];
+				forEach(temp,function (item,index,array){
+					if(indexOf(item.className.split(" "),argument) >= 0){
+						arr.push(item);
+					}
+				});
+				return arr;
+			}
+		// }
+		document.getElementsByClassName = null;
+		var ag = document.getElementById("box4");
+	getElement(".boe .opl .ol1");
+		// console.log(getElementsByClassName("he"));
+	</script>
+</body>
+</html>
