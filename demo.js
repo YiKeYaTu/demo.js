@@ -272,3 +272,77 @@ function getStyle(target,style){
 		return target.currentStyle[style];
 	}
 }
+function getElement (target) {
+			var elementPartitioning = target.split(","),
+				handle_arr = [],
+				i,
+				j,
+				k,
+				l,
+				lenI,
+				linJ,
+				temp = [],
+				tempT1 = [],
+				tempT2 = [];
+			for(i = 0,lenI = elementPartitioning.length;i < lenI;i++){
+				handle_arr[i] = elementPartitioning[i].split(" ");
+				for(j = 0,lenJ = handle_arr[i].length;j < lenJ;j++){
+					if(handle_arr[i][j][0] == "."){
+						if(temp.length == 0 && !j){
+							temp[0] = handle_arr[i][j];
+						}
+							if(j == 0){
+								tempT1 = getElementsByClassName(null,handle_arr[i][j].slice(1,handle_arr[i][j].length));
+								temp = tempT1;
+							}else{
+								tempT2 = temp;
+								temp = [];
+								for(l = 0;l < tempT2.length;l++){
+									tempT1 = getElementsByClassName(tempT2[l],handle_arr[i][j].slice(1,handle_arr[i][j].length));
+									temp = temp.concat(tempT1);
+								}
+							}
+					}else if(handle_arr[i][j][0] == "#"){
+						if(j == 0){
+							temp.push(document.getElementById(handle_arr[i][j].slice(1,handle_arr[i][j].length)));
+						}else{
+							tempT2 = temp;
+							temp = [];
+							for(l = 0;l < tempT2.length;l++){
+								tempT1 = document.getElementById(handle_arr[i][j].slice(1,handle_arr[i][j].length));
+								if(tempT1.parentNode == tempT2[l]){
+									temp = temp.concat(tempT1);
+								}
+							}
+						}
+					}else{
+						if(j == 0){
+							temp = document.getElementsByTagName(handle_arr[i][j]);
+						}else{
+							tempT2 = temp;
+							temp = [];
+							for(l = 0;l < tempT2.length;l++){
+								tempT1 = tempT2[l].getElementsByTagName(handle_arr[i][j].slice(1,handle_arr[i][j].length));
+								temp = temp.concat(tempT1);
+							}
+						}
+					}
+				}
+				console.log(temp);
+				return temp;
+			}
+		}
+		function getElementsByClassName (father,argument) {
+			var node = father || document
+				if(!node.getElementsByTagName){
+					return;
+				}
+				var	temp = node.getElementsByTagName("*"),
+					arr = [];
+				forEach(temp,function (item,index,array){
+					if(indexOf(item.className.split(" "),argument) >= 0){
+						arr.push(item);
+					}
+				});
+				return arr;
+			}
