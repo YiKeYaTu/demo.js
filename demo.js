@@ -346,3 +346,139 @@ function getElement (target) {
 				});
 				return arr;
 			}
+function Carousel(width,speed,rem) {
+    if (!this instanceof Carousel) {
+        return new Carousel(width,speed);
+    }
+    this.elementArray = [];
+    this.callbackElementArray = [];
+    this.count = 0;
+    this.width = width;
+    this.speed = speed || 5000;
+    this.timer = null;
+    this.callbackAction = null;//哪个小点处于激活状态
+
+}
+Carousel.prototype = {
+    constructor:Carousel,
+    start:function() {
+        this.timer = setTimeout(bind(this.left,this),this.speed);
+    },
+    pushElement:function(fatherNode) {
+        var childNode = fatherNode.children;
+        for(var i = 0;i < childNode.length;i++){
+            this.elementArray.push(childNode[i]);
+        }
+    },
+    pushcallbackElement:function(fatherNode) {
+        var childNode = fatherNode.children;
+        for(var i = 0;i < childNode.length;i++){
+            this.callbackElementArray.push(childNode[i]);
+            childNode[i].children[0].number = i;
+        }
+        this.callbackAction = this.callbackElementArray[0];
+    },
+    left:function() {
+        var arr = this.elementArray;
+        width = this.width;
+        if(this.count == arr.length - 1){
+            forEach(arr,function(item,index,array){
+                animation.move(item,{"left":index*width + ""},200);
+            })
+            this.count = 0;
+        } else {
+
+            forEach(arr,function(item,index,array) {
+                animation.move(item,{"left":parseInt(getStyle(item,"left")) - width},200);
+            });
+            this.count++;
+        }
+        !!this.callbackElementArray[0]&&this.callBack();
+        this.timer = setTimeout(bind(this.left,this),this.speed);
+    },
+    stop:function() {
+        if(this.timer) clearTimeout(this.timer);
+    },
+    callBack:function() {
+        this.callbackAction.className = "";
+        this.callbackAction = this.callbackElementArray[this.count];
+        this.callbackAction.className = "action";
+    },
+    click:function(num) {
+        this.stop();
+        var count = num,
+            width = this.width,
+            arr = this.elementArray;
+        forEach(arr,function(item,index,array) {
+            animation.move(item,{"left":(index - count) * width + ""},200);
+        })
+        this.count = num;
+        if (this.callbackElementArray.length > 1) {
+            this.callBack();
+        }
+        this.start();
+    },
+    touch:function(){
+    	if(!this.elementArray) return;
+    	var that = this,
+    		parent = that.elementArray[0].parentNode,
+        	arr = that.elementArray;
+        	width = that.width;
+    		oldX = 0,
+    		newX = 0,
+    		fPostion = 0,
+    		lPostion = 0,
+    		temp = 0,
+    		jud = false,
+    		distance = 0;
+    	parent.addEventListener("touchstart",function (e) {
+    		that.stop();
+    		fPostion = oldX = e.touches[0].pageX;
+    		jud = true;
+    	})
+    	parent.addEventListener("touchmove",function (e) {
+    		e.preventDefault();
+    		if(!jud) return;
+    		newX = e.touches[0].pageX;
+    		distance = newX - oldX;
+    		oldX = newX;
+    		forEach(arr,function(item,index,array) {
+    			item.style.left = parseInt(getStyle(item,"left")) + distance + "px";
+            });
+    	})
+    	parent.addEventListener("touchend",function (e) {
+    		lPostion = newX;
+    		if(Math.abs(lPostion - fPostion) < width/2){
+    			forEach(arr,function(item,index,array) {
+    				animation.move(item,{"left":parseInt(getStyle(item,"left")) - (lPostion - fPostion) + "px"},100);
+            	});
+            	that.start();
+    		}else{
+    			if(lPostion - fPostion < 0){
+    				if(that.count == that.elementArray.length - 1){
+    					forEach(arr,function(item,index,array) {
+		    				animation.move(item,{"left":parseInt(getStyle(item,"left")) - (lPostion - fPostion) + "px"},100);
+		            	});
+    					return;
+    				}
+    				that.click(++that.count);
+    			}else{
+    				if(that.count == 0){
+    					forEach(arr,function(item,index,array) {
+		    				animation.move(item,{"left":parseInt(getStyle(item,"left")) - (lPostion - fPostion) + "px"},100);
+		            	});
+    					return;
+    				}
+    				that.click(--that.count);
+    			}
+    		}
+    		jud = false;
+    	})
+    }
+}
+function bind(fn,context){
+	return function () {
+		fn.call(context);
+	}
+}
+
